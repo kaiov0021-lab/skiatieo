@@ -24,25 +24,53 @@
             max-height: 80%;
             border-radius: 8px;
         }
+        #status {
+            color: white;
+            font-family: sans-serif;
+        }
     </style>
 </head>
 <body>
 
-    <img id="fotoAleatoria" src="" alt="Imagem Aleatória">
+    <div id="status">Carregando...</div>
+    <img id="fotoAleatoria" src="" alt="Imagem Aleatória" style="display:none;">
 
     <script>
-        // COLOQUE AQUI O NOME EXATO DE CADA ARQUIVO QUE ESTIVER DENTRO DA PASTA "imagens"
-        const imagens = [
-            "imagens/foto1.jpg",
-            "imagens/foto2.jpg",
-            "imagens/foto3.jpg"
-        ];
+        // ===== ALTERE APENAS ESTAS DUAS LINHAS =====
+        const usuario = "SEU_USUARIO_DO_GITHUB";
+        const repositorio = "NOME_DO_SEU_REPOSITORIO";
+        // ============================================
 
-        // Sorteia um número aleatório dentro da lista
-        const escolhida = imagens[Math.floor(Math.random() * imagens.length)];
+        const pasta = "imagens";
+        const url = `https://api.github.com/repos/${usuario}/${repositorio}/contents/${pasta}`;
 
-        // Coloca a imagem sorteada na tela
-        document.getElementById("fotoAleatoria").src = escolhida;
+        fetch(url)
+            .then(resposta => resposta.json())
+            .then(arquivos => {
+                // Filtra só arquivos de imagem (ignora outros tipos que possam estar na pasta)
+                const extensoes = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+                const imagens = arquivos.filter(arquivo =>
+                    extensoes.some(ext => arquivo.name.toLowerCase().endsWith(ext))
+                );
+
+                if (imagens.length === 0) {
+                    document.getElementById("status").textContent = "Nenhuma imagem encontrada na pasta.";
+                    return;
+                }
+
+                // Sorteia uma imagem da lista
+                const escolhida = imagens[Math.floor(Math.random() * imagens.length)];
+
+                // Mostra a imagem sorteada
+                const img = document.getElementById("fotoAleatoria");
+                img.src = escolhida.download_url;
+                img.style.display = "block";
+                document.getElementById("status").style.display = "none";
+            })
+            .catch(erro => {
+                document.getElementById("status").textContent = "Erro ao buscar imagens. Confira o usuário e o repositório no código.";
+                console.error(erro);
+            });
     </script>
 
 </body>
