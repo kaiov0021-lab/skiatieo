@@ -3,37 +3,266 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>images (1).jpg</title>
+<title>Player Aleatório</title>
 <style>
+  :root {
+    --bg1: #1a1a2e;
+    --bg2: #16213e;
+    --accent: #e94560;
+    --accent2: #0f3460;
+    --text: #f1f1f1;
+    --muted: #a0a0c0;
+  }
+  * { box-sizing: border-box; }
   html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
     height: 100%;
-    background: #000;
+    margin: 0;
+  }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at 50% 20%, var(--bg2), var(--bg1) 70%);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
     overflow: hidden;
   }
-  .wrap {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    height: 100dvh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  .player {
+    text-align: center;
+    padding: 40px;
+    max-width: 90vw;
   }
-  img {
-    width: 100%;
+  .disc {
+    width: 220px;
+    height: 220px;
+    margin: 0 auto 36px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, #222 0 20px, #333 21px 60px, #111 61px 62px, #2a2a2a 63px 100%);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6), inset 0 0 0 6px #0a0a0a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    animation: spin 8s linear infinite;
+    animation-play-state: paused;
+  }
+  .disc.playing { animation-play-state: running; }
+  .disc::after {
+    content: "";
+    width: 22px;
+    height: 22px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px #111;
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  #playBtn {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(145deg, var(--accent), #c62b47);
+    color: white;
+    font-size: 34px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    box-shadow: 0 8px 20px rgba(233, 69, 96, 0.5);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  #playBtn:hover {
+    transform: scale(1.06);
+    box-shadow: 0 10px 28px rgba(233, 69, 96, 0.7);
+  }
+  #playBtn:active {
+    transform: scale(0.96);
+  }
+  #playBtn svg {
+    width: 34px;
+    height: 34px;
+    fill: white;
+    margin-left: 4px;
+  }
+  #playBtn.playing svg {
+    margin-left: 0;
+  }
+  .track-title {
+    margin-top: 28px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    min-height: 26px;
+    word-break: break-word;
+  }
+  .track-sub {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .status {
+    margin-top: 18px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .status.error {
+    color: var(--accent);
+  }
+  .progress-wrap {
+    margin-top: 22px;
+    width: 280px;
+    max-width: 70vw;
+    height: 4px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .progress-bar {
     height: 100%;
-    object-fit: contain;
-    object-position: center center;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.2s linear;
+  }
+  .count {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
   }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <img src="data:image/jpeg;base64,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" alt="images (1).jpg">
+
+<div class="player">
+  <div class="disc" id="disc"></div>
+
+  <button id="playBtn" aria-label="Tocar">
+    <svg id="iconPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <svg id="iconPause" viewBox="0 0 24 24" style="display:none;"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+  </button>
+
+  <div class="track-title" id="trackTitle">Aperte o play para começar</div>
+  <div class="track-sub" id="trackSub"></div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar" id="progressBar"></div>
   </div>
+
+  <div class="status" id="status"></div>
+  <div class="count" id="count"></div>
+</div>
+
+<audio id="audio" preload="none"></audio>
+
+<script>
+  // ======================================================================
+  // Nome da pasta onde estão os MP3s (deve ficar ao lado deste arquivo html)
+  // ======================================================================
+  const FOLDER = "musicas";
+
+  // Lista de faixas (extraída automaticamente do seu arquivo compactado)
+  const TRACKS = ["001. Once Upon a Time (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "002. Start Menu (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "003. Your Best Friend (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "004. Fallen Down (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "005. Ruins (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "006. Uwa__ So Temperate♫ (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "007. Anticipation (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "008. Unnecessary Tension (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "009. Enemy Approaching (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "01. Flashback (Excerpt) (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "010. Ghost Fight (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "011. Determination (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "012. Home (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "013. Home (Music Box) (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "014. Heartache (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "015. sans. (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "016. Nyeh Heh Heh_ (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "017. Snowy (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "018. Uwa__ So Holiday♫ (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "019. Dogbass (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "02. Feature Presentation (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "020. Mysterious Place (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "021. Dogsong (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "022. Snowdin Town (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "023. Shop (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "024. Bonetrousle (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "025. Dating Start_ (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "026. Dating Tense_ (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "027. Dating Fight_ (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "028. Premonition (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "029. Danger Mystery (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "03. And Now For Today_s Sponsors..._ (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "030. Undyne (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "031. Waterfall (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "032. Run_ (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "033. Quiet Water (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "034. Memory (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "035. Bird That Carries You Over A Disproportionately Small Gap (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "036. Dummy_ (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "037. Pathetic House (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "038. Spooktune (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "039. Spookwave (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "04. MIKE_ the BOARD_ please_ (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "040. Ghouliday (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "041. Chill (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "042. Thundersnail (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "043. Temmie Village (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "044. Tem Shop (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "045. NGAHHH__ (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "046. Spear of Justice (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "047. Ooo (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "048. Alphys (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "049. It_s Showtime_ (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "05. Sandy Board (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "050. Metal Crusher (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "051. Another Medium (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "052. Uwa__ So HEATS__♫ (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "053. Stronger Monsters (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "054. Hotel (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "055. Can You Really Call This A Hotel_ I Didn_t Receive A Mint On My Pillow Or Anything (UNDERTALE)(MP3_160K).mp3", "056. Confession (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "057. Live Report (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "058. Death Report (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "059. Spider Dance (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "06. Adventure Board (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "060. Wrong Enemy __ (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "061. Oh_ One True Love (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "062. Oh_ Dungeon (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "063. It_s Raining Somewhere Else (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "064. CORE Approach (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "065. CORE (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "066. Last Episode_ (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "067. Oh My... (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "068. Death By Glamour (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "069. For The Fans (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "07. Query_ (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "070. Long Elevator (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "071. Undertale (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "071. Undertale (UNDERTALE Soundtrack) - Toby Fox(MP3_160K)_1.mp3", "072. Song That Might Play When You Fight Sans (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "073. The Choice (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "074. Small Shock (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "075. Barrier (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "076. Bergentrückung (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "077. ASGORE (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "078. You Idiot (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "079. Your Best Nightmare (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "08. Quiz_ (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "080. Finale (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "081. An Ending (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "082. She_s Playing Piano (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "083. Here We Are (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "084. Amalgam (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "085. Fallen Down (Reprise) (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "086. Don_t Give Up (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "087. Hopes And Dreams (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "088. Burn In Despair_ (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "089. SAVE The World (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "09. Dig_ Dig_ To The Center of the Earth_ (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "090. His Theme (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "091. Final Power (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "092. Reunited (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "093. Menu (Full) (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "094. Respite (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "095. Bring It In_ Guys_ (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "096. Last Goodbye (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "097. But The Earth Refused To Die (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "098. Battle Against A True Hero (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "099. Power Of _NEO_ (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "1. Chapter 5 Logo (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "10. Pushing Buddies (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "10. Your Dad_s Best Friend (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "100. MEGALOVANIA (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "101. Good Night (UNDERTALE Soundtrack) - Toby Fox(MP3_160K).mp3", "11. Garden of Hopes and Dreams (DELTARUNE Chapter 5 Soundtrack) - Toby Fox _ _insaneintherainmusic(MP3_160K).mp3", "11. Ruder Buster (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "12. Physical Challenge (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "12. Rakuichi Buster (DELTARUNE Chapter 5 Soundtrack) - Toby Fox _ _KinemaNostalgia(MP3_160K).mp3", "13. Board Clear_ (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "13. The Diner Song of Best Friends (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "14. Ride the Board (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "14. Welcome to the Green Room (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "15. Quiet Glade (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "15. Vapor Buster (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "16. Paradise_ Paradise (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "16. Who might you be_ (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "17. Petal Dance (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "17. Raft Ride (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "18. Flying Feather (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "18. SOUTH OF THE BORDER__ (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "19. Sound Check (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "19. Sunset of Seven Suns (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "2. Inappropriate Recycling (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "20. Raise Up Your Bat (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "20. Shop 3 (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "21. KING OF ROLYPOLY (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "21. Violet Tactics (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "22. Flower King (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "22. Glowing Snow (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "23. Big City Board (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "23. Flower Foyer (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "24. Doom Board (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "24. Flower Castle (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "25. Metaphysical Challenge (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "25. Thousand Cafe Zukan (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "26. I_m Telling_ (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "26. TV WORLD (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "27. It_s TV Time_ (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "27. It_s TV Time_ (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K)_1.mp3", "27. Stop_ Criminell_ (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "28. Hall of Fame (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "28. Loving Steps (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "29. Breath (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "29. Onsen (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "3. Pirate Dojo (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "30. Beautiful Bathtime (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "30. Black Knife (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "30. Black Knife (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K)_1.mp3", "31. Crickets (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "31. Pink (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "32. Cutie Mew Mew Magic (DELTARUNE Chapter 5 Soundtrack) - Toby Fox _ _Cametek.CamelliaOfficial(MP3_160K).mp3", "32. Dump (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "33. Running Sky (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "33. SWORD (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "34. Flower Man (DELTARUNE Chapter 5 Soundtrack) - Toby Fox _ _Cametek.CamelliaOfficial(MP3_160K).mp3", "34. NORTHERNLIGHT (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "35. GLACEIR (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "35. That Day (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "36. BIT ROOTS (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "36. Dreamwatchers (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "37. ERAM (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "37. Weak Flowers (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "38. BURNING EYES (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "38. Walking Home (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "38. You Can Always Come Home (DELTARUNE Chapter 1 Soundtrack) - Toby Fox(MP3_160K).mp3", "39. BIG SHOT (DELTARUNE Chapter 2 Soundtrack) - Toby Fox(MP3_160K).mp3", "39. Field of Hopes and Dreams (From _DELTARUNE Piano Collections Vol. 1_) Credits Version - Toby Fox(MP3_160K).mp3", "39. Old wooden rafters (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "4. 4rd Sanctuary (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "40. Goodnight_ Sweet Prince (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "40. Hymn (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "41. Another day in hometown (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "42. Friends (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "43. Castle Funk (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "44. Knock You Down__ (Rhythm Ver.) (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "45. Gingerbread House (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "46. The distance between two (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "47. C (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "48. ATRIUM (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "49. Dark Sanctuary (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "5. Festival (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "5. The Door (DELTARUNE Chapter 1 Soundtrack) - Toby Fox(MP3_160K).mp3", "50. From Now On (Battle 2) (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "51. Gyaa Ha ha_ (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "52. Fireplace (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "53. A DARK ZONE (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "54. Mysterious Ringing (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "55. Ever Higher (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "56. Wise words (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "57. Piano that may not be played that well (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "58. Hammer of Justice (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "59. 12am (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "6. Catfession..._ (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "60. The Second Sanctuary (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "61. Ripple (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "62. 13am (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "63. The Third Sanctuary (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "64. Dark Place (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "65. Heavy Footsteps (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "66. Crumbling Tower (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "67. SPAWN (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "68. GUARDIAN (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "69. Need a hand__ (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "7. Bratfession..._ (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "70. The place where it rained (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "71. The Ol_ Jitterbug (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "72. Neverending Night (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox - Toby Fox(MP3_160K).mp3", "73. The LEGEND..._ (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "74. With Hope Crossed On Our Hearts (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "75. Volume Adjustment (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "76. Catswing (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "77. Air Waves (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "78. Concert for you (DELTARUNE Chapter 3 4 Soundtrack) - Toby Fox(MP3_160K).mp3", "8. I guess I_m in love (DELTARUNE Chapter 5 Soundtrack) - Toby Fox _ _it0ki(MP3_160K).mp3", "9. Weirder Birds (DELTARUNE Chapter 5 Soundtrack) - Toby Fox(MP3_160K).mp3", "A CYBER_S WORLD_(MP3_160K).mp3", "A Real Boy_(MP3_160K).mp3", "A Simple Diversion(MP3_160K).mp3", "A Town Called Hometown(MP3_160K).mp3", "ANOTHER HIM(MP3_160K).mp3", "ASGORE ATROPELANDO A DESS (EU VOU DIRIGIR) EXTENDIDO(MP3_160K).mp3", "Acid Tunnel of Love(MP3_160K).mp3", "Acid Tunnel of Love(MP3_160K)_1.mp3", "Almost to the Guys_(MP3_160K).mp3", "April 2012(MP3_160K).mp3", "Attack of the Killer Queen(MP3_160K).mp3", "BIG SHOT(MP3_160K).mp3", "Basement(MP3_160K).mp3", "Battle Against A Loving Mother(MP3_160K).mp3", "Before the Story(MP3_160K).mp3", "Before the Story(MP3_160K)_1.mp3", "Beginning(MP3_160K).mp3", "Berdly (Rejected Concept)(MP3_160K).mp3", "Berdly(MP3_160K).mp3", "Bluebird of Misfortune(MP3_160K).mp3", "Bones and More Bones (Megalovania in the Style of Hopes and Dreams)(MP3_160K).mp3", "Card Castle(MP3_160K).mp3", "Chaos King(MP3_160K).mp3", "Checker Dance(MP3_160K).mp3", "Chill Jailbreak Alarm to Study and Relax to(MP3_160K).mp3", "Chitãozinho _ Xororó - Evidências(MP3_160K).mp3", "Cliffs(MP3_160K).mp3", "Cool Beat(MP3_160K).mp3", "Cool Mixtape(MP3_160K).mp3", "Cyber Battle (Solo)(MP3_160K).mp3", "Darkness Falls(MP3_160K).mp3", "Deal Gone Wrong(MP3_160K).mp3", "Death Report(MP3_160K).mp3", "Dialtone(MP3_160K).mp3", "Dica do gato sabido(MP3_160K).mp3", "Digital Roots(MP3_160K).mp3", "Doki Doki Literature Club_ OST - Doki Doki Literature Club_ (Main Theme)(MP3_160K).mp3", "Doki Doki Literature Club_ OST Disc 2 - 05 Okay_ Everyone_ (Monika)(MP3_160K).mp3", "Doki Doki Literature Club_ _ Ending Song   Credits - Your Reality (Spoilers)(MP3_160K).mp3", "Don_t Forget(MP3_160K).mp3", "Elegant Entrance(MP3_160K).mp3", "Empty Town(MP3_160K).mp3", "Fahhhh - Sound effect (HD)(MP3_160K).mp3", "Faint Courage (Game Over)(MP3_160K).mp3", "Faint Glow(MP3_160K).mp3", "Fanfare (from _Rose of Winter_)(MP3_160K).mp3", "Fernanda Brum - Onde o Fogo Não Apaga (Ao Vivo)(MP3_160K).mp3", "Ferris Wheel(MP3_160K).mp3", "Field of Hopes and Dreams(MP3_160K).mp3", "Five Nights at Freddy_s 3 Song (Feat. EileMonty _ Orko) - Die In A Fire (FNAF3)  - Living Tombstone(MP3_160K).mp3", "Friendship(MP3_160K).mp3", "Galinha na árvore AAAAAAAAAAAAAAAAAAAAAAA(MP3_160K).mp3", "Gallery(MP3_160K).mp3", "Ghost Fight(MP3_160K).mp3", "Giga Size(MP3_160K).mp3", "Girl Next Door(MP3_160K).mp3", "HEY EVERY _(MP3_160K).mp3", "Handprint(MP3_160K).mp3", "Hip Shop(MP3_160K).mp3", "Holiday Studio(MP3_160K).mp3", "Homestuck Soundtest - Penumbra Phantasm (Piano)(MP3_160K).mp3", "I_m Very Bad(MP3_160K).mp3", "Imminent Death(MP3_160K).mp3", "It_s Pronounced _Rules_(MP3_160K).mp3", "It_s Pronounced _Rules_(MP3_160K)_1.mp3", "KEYGEN(MP3_160K).mp3", "Kleberiano - Comedor De Cu(MP3_160K).mp3", "Knock You Down __(MP3_160K).mp3", "Lancer Laugh (Deltarune)(MP3_160K).mp3", "Lancer(MP3_160K).mp3", "Lancer(MP3_160K)_1.mp3", "Lantern(MP3_160K).mp3", "Live Report(MP3_160K).mp3", "Lost Girl(MP3_160K).mp3", "Lovely Sad 24gh eaeaaa yeye yeye Original Lyrics(MP3_160K).mp3", "MADE IN HEAVEN - Crucified [Edit_AMV](MP3_160K).mp3", "MEDITAÇÃO GUIADA PARA DORMIR BEM_ RELAXAMENTO PROFUNDO(MP3_160K).mp3", "MEGALOVANIA - VS Susie _ Deltarune Battle Theme (LOOPABLE)(MP3_160K).mp3", "Mini Studio(MP3_160K).mp3", "My Castle Town(MP3_160K).mp3", "NOW_S YOUR CHANCE TO BE A(MP3_160K).mp3", "Ohhhhohohoho_(MP3_160K).mp3", "Pandora Palace(MP3_160K).mp3", "Powers Combined(MP3_160K).mp3", "Queen – Bohemian Rhapsody (Official Video Remastered)(MP3_160K).mp3", "Queen(MP3_160K).mp3", "Quiet Autumn(MP3_160K).mp3", "Rouxls Kaard(MP3_160K).mp3", "Rude Buster(MP3_160K).mp3", "Scarlet Forest(MP3_160K).mp3", "School(MP3_160K).mp3", "Smart Race(MP3_160K).mp3", "Sound Studio(MP3_160K).mp3", "Spamton(MP3_160K).mp3", "Spooktune(MP3_160K).mp3", "Susie Laugh (Deltarune)(MP3_160K).mp3", "Susie(MP3_160K).mp3", "THE HOLY(MP3_160K).mp3", "THE WORLD REVOLVING(MP3_160K).mp3", "THE WORLD REVOLVING(MP3_160K)_1.mp3", "The Chase(MP3_160K).mp3", "The Circus(MP3_160K).mp3", "The Dark Truth(MP3_160K).mp3", "The Door(MP3_160K).mp3", "The Legend(MP3_160K).mp3", "Thrash Machine(MP3_160K).mp3", "Tipo Kisame 🦈 (Naruto) _ Samehada Style Trap _ Prod. Sidney Scaccio _ MHRAP(MP3_160K).mp3", "Undertale - Omega Flowey Boss Fight(MP3_160K).mp3", "Until Next Time(MP3_160K).mp3", "Vs. Lancer(MP3_160K).mp3", "Vs. Susie NEO(MP3_160K).mp3", "Vs. Susie(MP3_160K).mp3", "Vs. Susie(MP3_160K)_1.mp3", "WELCOME TO THE CITY(MP3_160K).mp3", "Weird Birds(MP3_160K).mp3", "When I Get Happy I Dance Like This(MP3_160K).mp3", "When I Get Mad I Dance Like This(MP3_160K).mp3", "YTPBR - Felipe Neto Fala N_gga Ate Transceder A Materia(MP3_160K).mp3", "You Can Always Come Home(MP3_160K).mp3", "You Can Always Come Home(MP3_160K)_1.mp3", "Your Power(MP3_160K).mp3", "sans(MP3_160K).mp3", "undertale - fallen down but you_re stuck in the panic room(MP3_160K).mp3"];
+
+  const audio = document.getElementById('audio');
+  const playBtn = document.getElementById('playBtn');
+  const iconPlay = document.getElementById('iconPlay');
+  const iconPause = document.getElementById('iconPause');
+  const disc = document.getElementById('disc');
+  const trackTitle = document.getElementById('trackTitle');
+  const trackSub = document.getElementById('trackSub');
+  const statusEl = document.getElementById('status');
+  const countEl = document.getElementById('count');
+  const progressBar = document.getElementById('progressBar');
+
+  countEl.textContent = TRACKS.length + " músicas na pasta \"" + FOLDER + "\"";
+
+  let lastIndex = -1;
+  let isPlaying = false;
+
+  function cleanTitle(filename) {
+    let name = filename.replace(/\.mp3$/i, '');
+    name = name.replace(/\(MP3_160K\)/gi, '');
+    name = name.replace(/_1$/, '');
+    return name.trim();
+  }
+
+  function pickRandomIndex() {
+    if (TRACKS.length <= 1) return 0;
+    let idx;
+    do {
+      idx = Math.floor(Math.random() * TRACKS.length);
+    } while (idx === lastIndex);
+    return idx;
+  }
+
+  function loadAndPlay(index) {
+    lastIndex = index;
+    const file = TRACKS[index];
+    const encodedFolder = FOLDER.split('/').map(encodeURIComponent).join('/');
+    const src = encodedFolder + '/' + encodeURIComponent(file);
+    audio.src = src;
+    statusEl.textContent = '';
+    statusEl.classList.remove('error');
+    trackTitle.textContent = cleanTitle(file);
+    trackSub.textContent = 'Faixa ' + (index + 1) + ' de ' + TRACKS.length;
+
+    audio.play().then(() => {
+      setPlayingUI(true);
+    }).catch(err => {
+      setPlayingUI(false);
+      statusEl.classList.add('error');
+      statusEl.textContent = 'Não consegui carregar o arquivo. Confira se a pasta "' + FOLDER + '" está ao lado deste HTML e contém "' + file + '".';
+    });
+  }
+
+  function setPlayingUI(playing) {
+    isPlaying = playing;
+    disc.classList.toggle('playing', playing);
+    playBtn.classList.toggle('playing', playing);
+    iconPlay.style.display = playing ? 'none' : '';
+    iconPause.style.display = playing ? '' : 'none';
+    playBtn.setAttribute('aria-label', playing ? 'Pausar' : 'Tocar');
+  }
+
+  playBtn.addEventListener('click', () => {
+    if (!isPlaying) {
+      if (audio.src && !audio.ended && audio.currentTime > 0 && lastIndex !== -1 && audio.paused) {
+        // Havia uma pausa manual: tocamos uma música aleatória DIFERENTE, como pedido.
+      }
+      const idx = pickRandomIndex();
+      loadAndPlay(idx);
+    } else {
+      audio.pause();
+      setPlayingUI(false);
+    }
+  });
+
+  audio.addEventListener('ended', () => {
+    const idx = pickRandomIndex();
+    loadAndPlay(idx);
+  });
+
+  audio.addEventListener('timeupdate', () => {
+    if (audio.duration) {
+      progressBar.style.width = (audio.currentTime / audio.duration * 100) + '%';
+    }
+  });
+
+  audio.addEventListener('error', () => {
+    if (isPlaying) {
+      setPlayingUI(false);
+      statusEl.classList.add('error');
+      statusEl.textContent = 'Erro ao carregar o arquivo de áudio.';
+    }
+  });
+</script>
+
 </body>
 </html>
